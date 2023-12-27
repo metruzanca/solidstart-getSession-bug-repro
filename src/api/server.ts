@@ -65,6 +65,7 @@ export async function logout() {
 export async function getUser() {
   const session = await getSession();
   const userId = session.data.userId;
+  console.log('getUser\t\t', { userId });
   if (userId === undefined) throw redirect("/login");
 
   let user;
@@ -75,4 +76,28 @@ export async function getUser() {
   }
   if (!user) return logout();
   return { id: user.id, username: user.username };
+}
+
+// Loosely based off the logout action, since no formData is needed
+export async function createProject() {
+  const session = await getSession();
+  const userId = session.data.userId;
+  console.log('createProject\t', { userId });
+  if (userId === undefined) throw redirect("/login");
+
+  const project = await db.project.create(userId)
+
+  return project
+}
+
+// Based off the getUser cache function
+export async function listProjects() {
+  const session = await getSession();
+  const userId = session.data.userId;
+  console.log('listProjects\t', { userId });
+  if (userId === undefined) throw redirect("/login");
+
+  const projects = await db.project.list(userId)
+
+  return projects
 }

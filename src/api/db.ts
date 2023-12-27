@@ -7,6 +7,12 @@ type User = {
   password: string;
 };
 
+type Project = {
+  id: number;
+  owner_id: string;
+  name: string;
+}
+
 const storage = createStorage({
   driver: fsLiteDriver({
     base: "./.data",
@@ -44,4 +50,29 @@ export const db = {
       }
     },
   },
+  project: {
+    async create(user_id: string) {
+      const [{ value: projects }, { value: index }] = await storage.getItems([
+        "projects:data",
+        "projects:counter",
+      ]);
+
+      const project: Project = {
+        name: 'Project ' + Math.random(),
+        owner_id: user_id,
+        id: index as number
+      };
+      await Promise.all([
+        storage.setItem("projects:data", [...(projects as Project[] ?? []), project]),
+        storage.setItem("projects:counter", (index as number ?? 0) + 1),
+      ]);
+      return project;
+    },
+    async list(user_id: string) {
+      const projects = await storage.getItem("projects:data")
+      if (projects)    
+        return (projects as Project[]).filter(project => project.owner_id === user_id)
+      return []
+    }
+  }
 };
