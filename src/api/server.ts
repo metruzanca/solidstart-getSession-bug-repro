@@ -3,6 +3,7 @@ import { redirect } from "@solidjs/router";
 import { useSession } from "@solidjs/start/server";
 import { getRequestEvent } from "solid-js/web";
 import { db } from "./db";
+import { getSessionData } from "./session";
 
 function validateUsername(username: unknown) {
   if (typeof username !== "string" || username.length < 3) {
@@ -63,8 +64,7 @@ export async function logout() {
 }
 
 export async function getUser() {
-  const session = await getSession();
-  const userId = session.data.userId;
+  const { userId } = await getSessionData()
   console.log('getUser\t\t', { userId });
   if (userId === undefined) throw redirect("/login");
 
@@ -80,8 +80,7 @@ export async function getUser() {
 
 // Loosely based off the logout action, since no formData is needed
 export async function createProject() {
-  const session = await getSession();
-  const userId = session.data.userId;
+  const { userId } = await getSessionData()
   console.log('createProject\t', { userId });
   if (userId === undefined) throw redirect("/login");
 
@@ -92,8 +91,7 @@ export async function createProject() {
 
 // Based off the getUser cache function
 export async function listProjects() {
-  const session = await getSession();
-  const userId = session.data.userId;
+  const { userId } = await getSessionData()
   console.log('listProjects\t', { userId });
   if (userId === undefined) throw redirect("/login");
 
